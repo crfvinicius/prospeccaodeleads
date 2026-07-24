@@ -57,6 +57,33 @@ Acesse `/whatsapp`, clique em **Conectar** e escaneie o QR Code com o WhatsApp d
 
 Em `/campanhas`, filtre os leads por estágio/nicho/localidade, escreva a mensagem (com placeholders opcionais `{{nome}}`, `{{nicho}}`, `{{localidade}}`) e defina o intervalo mínimo/máximo em segundos entre cada envio. A campanha roda em background no processo do servidor (por isso precisa de um processo persistente — não funciona em ambientes serverless como Vercel) e pode ser pausada, retomada ou cancelada a qualquer momento em `/campanhas`.
 
+## Deploy (Cloudflare Containers)
+
+A aplicação roda como um Cloudflare Container (Docker, com processo persistente — necessário para manter a conexão do WhatsApp viva) atrás de um Worker de roteamento. O banco Postgres é externo (ex: [Neon](https://neon.tech), plano grátis).
+
+**Importante:** containers da Cloudflare não garantem disco persistente entre reinicializações — a sessão pareada do WhatsApp pode se perder de vez em quando e pedir para escanear o QR Code de novo. Se isso for um problema recorrente, considere um VPS tradicional.
+
+### Configuração única
+
+1. Crie um banco em [neon.tech](https://neon.tech) e copie a connection string.
+2. No Cloudflare, gere um **API Token** (dashboard → My Profile → API Tokens → Create Token, com permissão de editar Workers/Containers) e anote o **Account ID** (barra lateral direita do dashboard).
+3. No GitHub, em **Settings → Secrets and variables → Actions**, cadastre:
+   - `CLOUDFLARE_API_TOKEN`
+   - `CLOUDFLARE_ACCOUNT_ID`
+   - `DATABASE_URL` (a connection string do Neon)
+   - `GOOGLE_PLACES_API_KEY`
+
+### Deploy automático
+
+O workflow `.github/workflows/deploy.yml` builda a imagem Docker e publica no Cloudflare a cada push na branch `main` (ou manualmente via **Actions → Deploy → Run workflow**). Ele também sincroniza os secrets `DATABASE_URL` e `GOOGLE_PLACES_API_KEY` no Worker a cada execução.
+
+### Deploy manual (requer Docker local)
+
+```bash
+npx wrangler login
+npm run deploy
+```
+
 ## Estrutura
 
 ```
@@ -66,4 +93,8 @@ src/
   lib/            # regras de negócio (Prisma, Google Places, import de leads, WhatsApp)
 prisma/
   schema.prisma   # modelos: Lead, SearchQuery, Message, Campaign, CampaignLead
+worker/
+  index.ts        # Worker do Cloudflare que roteia requisições para o container
+Dockerfile        # imagem de produção da aplicação
+wrangler.jsonc    # configuração do deploy no Cloudflare Containers
 ```
