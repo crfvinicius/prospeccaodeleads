@@ -37,3 +37,11 @@ export const sendMessageSchema = z.object({
   leadId: z.string().min(1),
   mensagem: z.string().trim().min(1, "Mensagem não pode ser vazia"),
 });
+
+export const campaignCreateSchema = z.object({
+  nome: z.string().trim().min(1, "Informe um nome para a campanha"),
+  mensagem: z.string().trim().min(1, "Mensagem não pode ser vazia"),
+  leadIds: z.array(z.string().min(1)).min(1, "Selecione ao menos um lead"),
+  intervaloMinSegundos: z.coerce.number().int().min(1).max(600).default(8),
+  intervaloMaxSegundos: z.coerce.number().int().min(1).max(600).default(20),
+});

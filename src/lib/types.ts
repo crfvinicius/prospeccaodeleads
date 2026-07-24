@@ -19,3 +19,31 @@ export interface LeadDTO {
   createdAt: string;
   updatedAt: string;
 }
+
+export type CampaignStatus = "RODANDO" | "PAUSADA" | "CONCLUIDA" | "CANCELADA";
+
+export interface CampaignDTO {
+  id: string;
+  nome: string;
+  mensagem: string;
+  status: CampaignStatus;
+  intervaloMinSegundos: number;
+  intervaloMaxSegundos: number;
+  totalLeads: number;
+  enviados: number;
+  falhas: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CampaignLeadDTO {
+  id: string;
+  status: "PENDENTE" | "ENVIADO" | "FALHOU" | "PULADO";
+  erro: string | null;
+  lead: {
+    id: string;
+    nome: string;
+    telefone: string | null;
+    whatsapp: string | null;
+  };
+}

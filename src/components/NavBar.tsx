@@ -5,6 +5,7 @@ const LINKS = [
   { href: "/buscar", label: "Buscar leads" },
   { href: "/upload", label: "Upload" },
   { href: "/whatsapp", label: "WhatsApp" },
+  { href: "/campanhas", label: "Campanhas" },
 ];
 
 export function NavBar() {

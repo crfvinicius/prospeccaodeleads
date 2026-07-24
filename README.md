@@ -8,6 +8,7 @@ Sistema de prospecção automática de leads com CRM em kanban e contato automat
 - **Upload de leads** a partir de planilha `.xlsx` ou tabela em Markdown.
 - **CRM em kanban** para acompanhar o funil (Novo → Contatado → Respondeu → Negociando → Fechado/Perdido), com leads arrastáveis entre colunas.
 - **Contato automático via WhatsApp** (Baileys), com pareamento por QR Code e histórico de mensagens por lead.
+- **Campanhas em massa no WhatsApp**: seleção de leads por estágio/nicho/localidade, mensagem personalizável (`{{nome}}`, `{{nicho}}`, `{{localidade}}`) e envio sequencial com intervalo aleatório configurável entre mensagens, com pausa/retomada/cancelamento.
 
 ## Stack
 
@@ -52,6 +53,10 @@ Sistema de prospecção automática de leads com CRM em kanban e contato automat
 
 Acesse `/whatsapp`, clique em **Conectar** e escaneie o QR Code com o WhatsApp do número que fará os contatos (mesmo fluxo do WhatsApp Web). Essa automação usa uma biblioteca não-oficial (Baileys) — não é a API oficial da Meta, então **respeite volumes moderados de envio** para reduzir o risco de o número ser bloqueado pelo WhatsApp.
 
+## Campanhas em massa
+
+Em `/campanhas`, filtre os leads por estágio/nicho/localidade, escreva a mensagem (com placeholders opcionais `{{nome}}`, `{{nicho}}`, `{{localidade}}`) e defina o intervalo mínimo/máximo em segundos entre cada envio. A campanha roda em background no processo do servidor (por isso precisa de um processo persistente — não funciona em ambientes serverless como Vercel) e pode ser pausada, retomada ou cancelada a qualquer momento em `/campanhas`.
+
 ## Estrutura
 
 ```
@@ -60,5 +65,5 @@ src/
   components/     # componentes de UI (kanban, formulários, conexão WhatsApp)
   lib/            # regras de negócio (Prisma, Google Places, import de leads, WhatsApp)
 prisma/
-  schema.prisma   # modelos: Lead, SearchQuery, Message
+  schema.prisma   # modelos: Lead, SearchQuery, Message, Campaign, CampaignLead
 ```
