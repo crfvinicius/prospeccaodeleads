@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum KanbanStage {
+  NOVO
+  CONTATADO
+  RESPONDEU
+  NEGOCIANDO
+  FECHADO
+  PERDIDO
+}
+
+enum LeadOrigem {
+  GOOGLE_PLACES
+  UPLOAD_XLSX
+  UPLOAD_MARKDOWN
+  MANUAL
+}
+
+enum MessageDirection {
+  ENVIADA
+  RECEBIDA
+}
+
+enum MessageStatus {
+  PENDENTE
+  ENVIADA
+  ENTREGUE
+  LIDA
+  FALHOU
+}
+
+enum CampaignStatus {
+  RODANDO
+  PAUSADA
+  CONCLUIDA
+  CANCELADA
+}
+
+enum CampaignLeadStatus {
+  PENDENTE
+  ENVIADO
+  FALHOU
+  PULADO
+}
+
+model SearchQuery {
+  id             String   @id @default(cuid())
+  localidade     String
+  nicho          String
+  quantidade     Int
+  avaliacaoMinima Float?
+  somenteComSite     Boolean?
+  somenteComWhatsapp Boolean?
+  createdAt      DateTime @default(now())
+
+  leads Lead[]
+}
+
+model Lead {
+  id              String      @id @default(cuid())
+  nome            String
+  telefone        String?
+  whatsapp        String?
+  endereco        String?
+  localidade      String?
+  nicho           String?
+  avaliacaoGoogle Float?
+  totalAvaliacoes Int?
+  site            String?
+  temSite         Boolean     @default(false)
+  temWhatsapp     Boolean     @default(false)
+  origem          LeadOrigem  @default(MANUAL)
+  estagio         KanbanStage @default(NOVO)
+  googlePlaceId   String?     @unique
+  observacoes     String?
+
+  searchQueryId String?
+  searchQuery   SearchQuery? @relation(fields: [searchQueryId], references: [id])
+
+  mensagens      Message[]
+  campanhaLeads  CampaignLead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([estagio])
+  @@index([localidade])
+  @@index([nicho])
+}
+
+model Message {
+  id        String            @id @default(cuid())
+  leadId    String
+  lead      Lead              @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  direcao   MessageDirection
+  conteudo  String
+  status    MessageStatus     @default(PENDENTE)
+  createdAt DateTime          @default(now())
+
+  @@index([leadId])
+}
+
+model Campaign {
+  id                   String         @id @default(cuid())
+  nome                 String
+  mensagem             String
+  status               CampaignStatus @default(RODANDO)
+  intervaloMinSegundos Int            @default(8)
+  intervaloMaxSegundos Int            @default(20)
+  totalLeads           Int
+  enviados             Int            @default(0)
+  falhas               Int            @default(0)
+
+  leads CampaignLead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CampaignLead {
+  id          String             @id @default(cuid())
+  campaignId  String
+  campaign    Campaign           @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  leadId      String
+  lead        Lead               @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  status      CampaignLeadStatus @default(PENDENTE)
+  messageId   String?
+  erro        String?
+  processedAt DateTime?
+
+  @@unique([campaignId, leadId])
+  @@index([campaignId])
+}
