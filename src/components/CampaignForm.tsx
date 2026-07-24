@@ -3,6 +3,11 @@
 import { useState, type FormEvent } from "react";
 import { KANBAN_STAGES } from "@/lib/constants";
 import type { LeadDTO } from "@/lib/types";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+
+const inputClass =
+  "rounded-lg border border-black/10 p-2 text-sm dark:border-white/10 dark:bg-neutral-900";
 
 export function CampaignForm({ onCreated }: { onCreated: () => void }) {
   const [estagio, setEstagio] = useState("NOVO");
@@ -98,13 +103,13 @@ export function CampaignForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <div className="grid gap-4">
-      <div className="grid gap-2 rounded-md border border-black/10 p-3 dark:border-white/10">
+      <Card className="grid gap-2">
         <p className="text-sm font-medium">1. Selecione os leads</p>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <select
             value={estagio}
             onChange={(e) => setEstagio(e.target.value)}
-            className="rounded border border-black/10 p-2 text-sm dark:border-white/10 dark:bg-neutral-900"
+            className={inputClass}
           >
             <option value="">Qualquer estágio</option>
             {KANBAN_STAGES.map((stage) => (
@@ -117,23 +122,24 @@ export function CampaignForm({ onCreated }: { onCreated: () => void }) {
             value={nicho}
             onChange={(e) => setNicho(e.target.value)}
             placeholder="Filtrar por nicho"
-            className="rounded border border-black/10 p-2 text-sm dark:border-white/10 dark:bg-neutral-900"
+            className={inputClass}
           />
           <input
             value={localidade}
             onChange={(e) => setLocalidade(e.target.value)}
             placeholder="Filtrar por localidade"
-            className="rounded border border-black/10 p-2 text-sm dark:border-white/10 dark:bg-neutral-900"
+            className={inputClass}
           />
         </div>
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={buscarLeads}
           disabled={buscando}
-          className="w-fit rounded border border-black/10 px-3 py-1.5 text-sm disabled:opacity-50 dark:border-white/10"
+          className="w-fit"
         >
           {buscando ? "Buscando..." : "Buscar leads com telefone"}
-        </button>
+        </Button>
 
         {candidatos && (
           <div className="mt-2">
@@ -165,73 +171,75 @@ export function CampaignForm({ onCreated }: { onCreated: () => void }) {
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
-      <form onSubmit={handleSubmit} className="grid gap-2 rounded-md border border-black/10 p-3 dark:border-white/10">
-        <p className="text-sm font-medium">2. Configure a mensagem e dispare</p>
+      <Card>
+        <form onSubmit={handleSubmit} className="grid gap-2">
+          <p className="text-sm font-medium">2. Configure a mensagem e dispare</p>
 
-        <label className="grid gap-1 text-sm">
-          Nome da campanha
-          <input
-            required
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="Ex: Padarias SP - Julho"
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
-
-        <label className="grid gap-1 text-sm">
-          Mensagem (use {"{{nome}}"}, {"{{nicho}}"}, {"{{localidade}}"} para personalizar)
-          <textarea
-            required
-            rows={3}
-            value={mensagem}
-            onChange={(e) => setMensagem(e.target.value)}
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
-
-        <div className="grid grid-cols-2 gap-2">
           <label className="grid gap-1 text-sm">
-            Intervalo mínimo (segundos)
+            Nome da campanha
             <input
-              type="number"
-              min={1}
-              max={600}
-              value={intervaloMin}
-              onChange={(e) => setIntervaloMin(Number(e.target.value))}
-              className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
+              required
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Ex: Padarias SP - Julho"
+              className={inputClass}
             />
           </label>
+
           <label className="grid gap-1 text-sm">
-            Intervalo máximo (segundos)
-            <input
-              type="number"
-              min={1}
-              max={600}
-              value={intervaloMax}
-              onChange={(e) => setIntervaloMax(Number(e.target.value))}
-              className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
+            Mensagem (use {"{{nome}}"}, {"{{nicho}}"}, {"{{localidade}}"} para personalizar)
+            <textarea
+              required
+              rows={3}
+              value={mensagem}
+              onChange={(e) => setMensagem(e.target.value)}
+              className={inputClass}
             />
           </label>
-        </div>
-        <p className="text-xs text-neutral-500">
-          Um intervalo aleatório entre esses valores é aguardado entre cada envio,
-          para reduzir o risco de o número ser bloqueado pelo WhatsApp.
-        </p>
 
-        <button
-          type="submit"
-          disabled={enviando || !candidatos || selecionados.size === 0}
-          className="mt-1 w-fit rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
-        >
-          {enviando ? "Iniciando..." : `Disparar campanha (${selecionados.size} leads)`}
-        </button>
+          <div className="grid grid-cols-2 gap-2">
+            <label className="grid gap-1 text-sm">
+              Intervalo mínimo (segundos)
+              <input
+                type="number"
+                min={1}
+                max={600}
+                value={intervaloMin}
+                onChange={(e) => setIntervaloMin(Number(e.target.value))}
+                className={inputClass}
+              />
+            </label>
+            <label className="grid gap-1 text-sm">
+              Intervalo máximo (segundos)
+              <input
+                type="number"
+                min={1}
+                max={600}
+                value={intervaloMax}
+                onChange={(e) => setIntervaloMax(Number(e.target.value))}
+                className={inputClass}
+              />
+            </label>
+          </div>
+          <p className="text-xs text-neutral-500">
+            Um intervalo aleatório entre esses valores é aguardado entre cada envio,
+            para reduzir o risco de o número ser bloqueado pelo WhatsApp.
+          </p>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {successMessage && <p className="text-sm text-green-600">{successMessage}</p>}
-      </form>
+          <Button
+            type="submit"
+            disabled={enviando || !candidatos || selecionados.size === 0}
+            className="mt-1 w-fit"
+          >
+            {enviando ? "Iniciando..." : `Disparar campanha (${selecionados.size} leads)`}
+          </Button>
+
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          {successMessage && <p className="text-sm text-green-600">{successMessage}</p>}
+        </form>
+      </Card>
     </div>
   );
 }

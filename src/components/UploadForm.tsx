@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 
 export function UploadForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,24 +45,22 @@ export function UploadForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid max-w-xl gap-3">
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".xlsx,.md,.markdown"
-        className="text-sm"
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-fit rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
-      >
-        {loading ? "Importando..." : "Importar leads"}
-      </button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {successMessage && (
-        <p className="text-sm text-green-600">{successMessage}</p>
-      )}
-    </form>
+    <Card className="max-w-xl">
+      <form onSubmit={handleSubmit} className="grid gap-3">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.md,.markdown"
+          className="text-sm"
+        />
+        <Button type="submit" disabled={loading} className="w-fit">
+          {loading ? "Importando..." : "Importar leads"}
+        </Button>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        {successMessage && (
+          <p className="text-sm text-green-600">{successMessage}</p>
+        )}
+      </form>
+    </Card>
   );
 }

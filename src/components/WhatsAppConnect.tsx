@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 interface StatusResponse {
   status: "desconectado" | "conectando" | "aguardando_qr" | "conectado";
@@ -12,6 +15,13 @@ const STATUS_LABEL: Record<StatusResponse["status"], string> = {
   conectando: "Conectando...",
   aguardando_qr: "Aguardando leitura do QR Code",
   conectado: "Conectado",
+};
+
+const STATUS_TONE: Record<StatusResponse["status"], "neutral" | "amber" | "green"> = {
+  desconectado: "neutral",
+  conectando: "amber",
+  aguardando_qr: "amber",
+  conectado: "green",
 };
 
 export function WhatsAppConnect() {
@@ -45,12 +55,12 @@ export function WhatsAppConnect() {
   }
 
   return (
-    <div className="max-w-md">
-      <p className="mb-3 text-sm">
-        Status:{" "}
-        <span className="font-medium">
+    <Card className="max-w-md">
+      <p className="mb-3 flex items-center gap-2 text-sm">
+        Status:
+        <Badge tone={status ? STATUS_TONE[status.status] : "neutral"}>
           {status ? STATUS_LABEL[status.status] : "Carregando..."}
-        </span>
+        </Badge>
       </p>
 
       {status?.qrDataUrl && (
@@ -58,28 +68,25 @@ export function WhatsAppConnect() {
         <img
           src={status.qrDataUrl}
           alt="QR Code do WhatsApp"
-          className="mb-4 h-64 w-64 border border-black/10 dark:border-white/10"
+          className="mb-4 h-64 w-64 rounded-lg border border-black/10 dark:border-white/10"
         />
       )}
 
       <div className="flex gap-2">
-        <button
-          type="button"
+        <Button
           onClick={handleConnect}
           disabled={status?.status === "conectado" || status?.status === "conectando"}
-          className="rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
         >
           Conectar
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="secondary"
           onClick={handleDisconnect}
           disabled={!status || status.status === "desconectado"}
-          className="rounded border border-black/10 px-4 py-2 text-sm disabled:opacity-50 dark:border-white/10"
         >
           Desconectar
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }

@@ -2,12 +2,35 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { CampaignDTO, CampaignLeadDTO } from "@/lib/types";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
 
 const STATUS_LABEL: Record<CampaignDTO["status"], string> = {
   RODANDO: "Rodando",
   PAUSADA: "Pausada",
   CONCLUIDA: "Concluída",
   CANCELADA: "Cancelada",
+};
+
+const STATUS_TONE: Record<
+  CampaignDTO["status"],
+  "neutral" | "amber" | "green" | "red"
+> = {
+  RODANDO: "green",
+  PAUSADA: "amber",
+  CONCLUIDA: "neutral",
+  CANCELADA: "red",
+};
+
+const LEAD_STATUS_TONE: Record<
+  CampaignLeadDTO["status"],
+  "neutral" | "green" | "red" | "amber"
+> = {
+  ENVIADO: "green",
+  FALHOU: "red",
+  PULADO: "amber",
+  PENDENTE: "neutral",
 };
 
 function CampaignDetails({ campaignId }: { campaignId: string }) {
@@ -22,26 +45,14 @@ function CampaignDetails({ campaignId }: { campaignId: string }) {
   if (!leads) return <p className="text-xs text-neutral-500">Carregando...</p>;
 
   return (
-    <ul className="mt-2 max-h-48 overflow-y-auto rounded border border-black/10 text-xs dark:border-white/10">
+    <ul className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-black/10 text-xs dark:border-white/10">
       {leads.map((cl) => (
         <li
           key={cl.id}
           className="flex items-center justify-between border-b border-black/5 p-1.5 last:border-0 dark:border-white/5"
         >
           <span>{cl.lead.nome}</span>
-          <span
-            className={
-              cl.status === "ENVIADO"
-                ? "text-green-600"
-                : cl.status === "FALHOU"
-                  ? "text-red-600"
-                  : cl.status === "PULADO"
-                    ? "text-amber-600"
-                    : "text-neutral-500"
-            }
-          >
-            {cl.status}
-          </span>
+          <Badge tone={LEAD_STATUS_TONE[cl.status]}>{cl.status}</Badge>
         </li>
       ))}
     </ul>
@@ -78,11 +89,15 @@ export function CampaignList({ refreshKey }: { refreshKey: number }) {
   }
 
   if (campaigns.length === 0) {
-    return <p className="text-sm text-neutral-500">Nenhuma campanha criada ainda.</p>;
+    return (
+      <Card>
+        <p className="text-sm text-neutral-500">Nenhuma campanha criada ainda.</p>
+      </Card>
+    );
   }
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       {campaigns.map((campaign) => {
         const progresso =
           campaign.totalLeads > 0
@@ -90,20 +105,17 @@ export function CampaignList({ refreshKey }: { refreshKey: number }) {
             : 0;
 
         return (
-          <div
-            key={campaign.id}
-            className="rounded-md border border-black/10 p-3 text-sm dark:border-white/10"
-          >
+          <Card key={campaign.id}>
             <div className="flex items-center justify-between">
               <p className="font-medium">{campaign.nome}</p>
-              <span className="text-xs text-neutral-500">
+              <Badge tone={STATUS_TONE[campaign.status]}>
                 {STATUS_LABEL[campaign.status]}
-              </span>
+              </Badge>
             </div>
 
-            <div className="mt-1 h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+            <div className="mt-2 h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
               <div
-                className="h-1.5 rounded-full bg-black dark:bg-white"
+                className="h-1.5 rounded-full bg-indigo-600 transition-all"
                 style={{ width: `${progresso}%` }}
               />
             </div>
@@ -112,47 +124,47 @@ export function CampaignList({ refreshKey }: { refreshKey: number }) {
               {campaign.totalLeads}
             </p>
 
-            <div className="mt-2 flex gap-2">
+            <div className="mt-3 flex items-center gap-2">
               {campaign.status === "RODANDO" && (
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => handleAction(campaign.id, "pause")}
-                  className="rounded border border-black/10 px-2 py-1 text-xs dark:border-white/10"
                 >
                   Pausar
-                </button>
+                </Button>
               )}
               {campaign.status === "PAUSADA" && (
-                <button
-                  type="button"
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => handleAction(campaign.id, "resume")}
-                  className="rounded border border-black/10 px-2 py-1 text-xs dark:border-white/10"
                 >
                   Retomar
-                </button>
+                </Button>
               )}
               {(campaign.status === "RODANDO" || campaign.status === "PAUSADA") && (
-                <button
-                  type="button"
+                <Button
+                  variant="danger"
+                  size="sm"
                   onClick={() => handleAction(campaign.id, "cancel")}
-                  className="rounded border border-black/10 px-2 py-1 text-xs text-red-600 dark:border-white/10"
                 >
                   Cancelar
-                </button>
+                </Button>
               )}
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() =>
                   setExpanded((current) => (current === campaign.id ? null : campaign.id))
                 }
-                className="text-xs text-blue-600 hover:underline"
               >
                 {expanded === campaign.id ? "Ocultar leads" : "Ver leads"}
-              </button>
+              </Button>
             </div>
 
             {expanded === campaign.id && <CampaignDetails campaignId={campaign.id} />}
-          </div>
+          </Card>
         );
       })}
     </div>

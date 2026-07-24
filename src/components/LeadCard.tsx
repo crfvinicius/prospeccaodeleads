@@ -2,7 +2,10 @@
 
 import { useDraggable } from "@dnd-kit/core";
 import { useState } from "react";
+import { Star, Globe, MessageCircle } from "lucide-react";
 import type { LeadDTO } from "@/lib/types";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 
 export function LeadCard({ lead }: { lead: LeadDTO }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -48,7 +51,7 @@ export function LeadCard({ lead }: { lead: LeadDTO }) {
     <div
       ref={setNodeRef}
       style={style}
-      className="rounded-md border border-black/10 bg-white p-3 text-sm shadow-sm dark:border-white/10 dark:bg-neutral-900"
+      className="rounded-lg border border-black/10 bg-white p-3 text-sm shadow-sm dark:border-white/10 dark:bg-neutral-900"
     >
       <div
         {...listeners}
@@ -59,27 +62,39 @@ export function LeadCard({ lead }: { lead: LeadDTO }) {
         <p className="text-xs text-neutral-500">
           {[lead.localidade, lead.nicho].filter(Boolean).join(" · ")}
         </p>
-        <div className="mt-1 flex flex-wrap gap-1 text-xs text-neutral-500">
+        <div className="mt-1.5 flex flex-wrap gap-1">
           {lead.avaliacaoGoogle != null && (
-            <span>⭐ {lead.avaliacaoGoogle.toFixed(1)}</span>
+            <Badge tone="amber">
+              <Star size={11} className="mr-0.5 fill-current" />
+              {lead.avaliacaoGoogle.toFixed(1)}
+            </Badge>
           )}
-          {lead.temSite && <span className="text-green-600">site</span>}
+          {lead.temSite && (
+            <Badge tone="blue">
+              <Globe size={11} className="mr-1" />
+              site
+            </Badge>
+          )}
           {lead.temWhatsapp && (
-            <span className="text-green-600">whatsapp</span>
+            <Badge tone="green">
+              <MessageCircle size={11} className="mr-1" />
+              whatsapp
+            </Badge>
           )}
         </div>
       </div>
 
       <div className="mt-2">
         {!showForm ? (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="!px-0"
             onClick={() => setShowForm(true)}
             disabled={!lead.telefone && !lead.whatsapp}
-            className="text-xs text-blue-600 hover:underline disabled:text-neutral-400 disabled:no-underline"
           >
             Enviar mensagem
-          </button>
+          </Button>
         ) : (
           <div className="mt-1 flex flex-col gap-1">
             <textarea
@@ -89,21 +104,16 @@ export function LeadCard({ lead }: { lead: LeadDTO }) {
               className="w-full rounded border border-black/10 p-1 text-xs dark:border-white/10 dark:bg-neutral-800"
             />
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleSend}
-                disabled={sending}
-                className="rounded bg-green-600 px-2 py-1 text-xs text-white disabled:opacity-50"
-              >
+              <Button size="sm" onClick={handleSend} disabled={sending}>
                 {sending ? "Enviando..." : "Enviar"}
-              </button>
-              <button
-                type="button"
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={() => setShowForm(false)}
-                className="text-xs text-neutral-500"
               >
                 Cancelar
-              </button>
+              </Button>
             </div>
           </div>
         )}

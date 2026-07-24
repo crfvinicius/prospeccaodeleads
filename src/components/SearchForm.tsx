@@ -2,6 +2,11 @@
 
 import { useState, type FormEvent } from "react";
 import type { LeadDTO } from "@/lib/types";
+import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+
+const inputClass =
+  "rounded-lg border border-black/10 p-2 text-sm dark:border-white/10 dark:bg-neutral-900";
 
 export function SearchForm() {
   const [localidade, setLocalidade] = useState("");
@@ -54,99 +59,97 @@ export function SearchForm() {
 
   return (
     <div>
-      <form onSubmit={handleSubmit} className="grid max-w-xl gap-3">
-        <label className="grid gap-1 text-sm">
-          Localidade
-          <input
-            required
-            value={localidade}
-            onChange={(e) => setLocalidade(e.target.value)}
-            placeholder="Ex: São Paulo, SP"
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
+      <Card className="max-w-xl">
+        <form onSubmit={handleSubmit} className="grid gap-3">
+          <label className="grid gap-1 text-sm">
+            Localidade
+            <input
+              required
+              value={localidade}
+              onChange={(e) => setLocalidade(e.target.value)}
+              placeholder="Ex: São Paulo, SP"
+              className={inputClass}
+            />
+          </label>
 
-        <label className="grid gap-1 text-sm">
-          Nicho
-          <input
-            required
-            value={nicho}
-            onChange={(e) => setNicho(e.target.value)}
-            placeholder="Ex: clínicas odontológicas"
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
+          <label className="grid gap-1 text-sm">
+            Nicho
+            <input
+              required
+              value={nicho}
+              onChange={(e) => setNicho(e.target.value)}
+              placeholder="Ex: clínicas odontológicas"
+              className={inputClass}
+            />
+          </label>
 
-        <label className="grid gap-1 text-sm">
-          Quantidade de leads
-          <input
-            type="number"
-            min={1}
-            max={60}
-            value={quantidade}
-            onChange={(e) => setQuantidade(Number(e.target.value))}
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
+          <label className="grid gap-1 text-sm">
+            Quantidade de leads
+            <input
+              type="number"
+              min={1}
+              max={60}
+              value={quantidade}
+              onChange={(e) => setQuantidade(Number(e.target.value))}
+              className={inputClass}
+            />
+          </label>
 
-        <label className="grid gap-1 text-sm">
-          Avaliação mínima no Google (0-5)
-          <input
-            type="number"
-            min={0}
-            max={5}
-            step={0.1}
-            value={avaliacaoMinima}
-            onChange={(e) => setAvaliacaoMinima(e.target.value)}
-            placeholder="Sem filtro"
-            className="rounded border border-black/10 p-2 dark:border-white/10 dark:bg-neutral-900"
-          />
-        </label>
+          <label className="grid gap-1 text-sm">
+            Avaliação mínima no Google (0-5)
+            <input
+              type="number"
+              min={0}
+              max={5}
+              step={0.1}
+              value={avaliacaoMinima}
+              onChange={(e) => setAvaliacaoMinima(e.target.value)}
+              placeholder="Sem filtro"
+              className={inputClass}
+            />
+          </label>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={somenteComSite}
-            onChange={(e) => {
-              setSomenteComSite(e.target.checked);
-              if (e.target.checked) setSomenteSemSite(false);
-            }}
-          />
-          Somente com site
-        </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={somenteComSite}
+              onChange={(e) => {
+                setSomenteComSite(e.target.checked);
+                if (e.target.checked) setSomenteSemSite(false);
+              }}
+            />
+            Somente com site
+          </label>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={somenteSemSite}
-            onChange={(e) => {
-              setSomenteSemSite(e.target.checked);
-              if (e.target.checked) setSomenteComSite(false);
-            }}
-          />
-          Somente sem site
-        </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={somenteSemSite}
+              onChange={(e) => {
+                setSomenteSemSite(e.target.checked);
+                if (e.target.checked) setSomenteComSite(false);
+              }}
+            />
+            Somente sem site
+          </label>
 
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={somenteComWhatsapp}
-            onChange={(e) => setSomenteComWhatsapp(e.target.checked)}
-          />
-          Somente com WhatsApp (requer WhatsApp conectado)
-        </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={somenteComWhatsapp}
+              onChange={(e) => setSomenteComWhatsapp(e.target.checked)}
+            />
+            Somente com WhatsApp (requer WhatsApp conectado)
+          </label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="mt-2 rounded bg-black px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
-        >
-          {loading ? "Buscando..." : "Buscar leads"}
-        </button>
-      </form>
+          <Button type="submit" disabled={loading} className="mt-1 w-fit">
+            {loading ? "Buscando..." : "Buscar leads"}
+          </Button>
+        </form>
 
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-      {warning && <p className="mt-4 text-sm text-amber-600">{warning}</p>}
+        {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+        {warning && <p className="mt-4 text-sm text-amber-600">{warning}</p>}
+      </Card>
 
       {results && (
         <div className="mt-6">
@@ -155,14 +158,13 @@ export function SearchForm() {
           </p>
           <ul className="grid gap-2">
             {results.map((lead) => (
-              <li
-                key={lead.id}
-                className="rounded border border-black/10 p-2 text-sm dark:border-white/10"
-              >
-                <p className="font-medium">{lead.nome}</p>
-                <p className="text-xs text-neutral-500">
-                  {[lead.endereco, lead.telefone].filter(Boolean).join(" · ")}
-                </p>
+              <li key={lead.id}>
+                <Card>
+                  <p className="font-medium">{lead.nome}</p>
+                  <p className="text-xs text-neutral-500">
+                    {[lead.endereco, lead.telefone].filter(Boolean).join(" · ")}
+                  </p>
+                </Card>
               </li>
             ))}
           </ul>
